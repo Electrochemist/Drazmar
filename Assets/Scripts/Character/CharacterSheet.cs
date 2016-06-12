@@ -4,6 +4,8 @@ using System.Collections;
 public class CharacterSheet : MonoBehaviour // This will hold all the character stats, and information - Note values done as ints for speed so will be rounding - will probably have sub classes at a later point
 {
     public CharacterSheet characterSheet; // place holder for the character sheet instance on this gameobject
+    private DecisionMaking decisionMaking; // same to cross talk to decision making script
+
     // Attack properties
     private int attackChargeMax; // charge maximium
     private float attackChargeCurrent; // charge current - float due to time step multiplication
@@ -16,6 +18,7 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     private int attackAccuracy; // likelyhood of attack to hit
 
     public string enemyTag;
+    public string safeZoneTag;
 
     public int AttackAccuracy
     {
@@ -65,6 +68,8 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     private float damageHitInFront; // enemies bonus to damage the front
     private float damageHitInPeripheral; // enemies bonus to damage the peripheral
     private float damageHitInBack; // enemies bonus to damage the back
+    private bool inSafeZone; // is the unit within a safe zone
+    private int safeZoneHealRate; // healing rate of the safe zone
 
     public float AccuracyHitInFront
     {
@@ -136,8 +141,9 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     private int forwardAngle; // angle in degrees that the character can perform forward actions within
     private int peripheralAngle; // angle in degrees that the character can perform perihpheral action within
     // private int backAngle; - probably not needed as this will be greater than perihperal but less than 180;
-    private int movementSpeed; // how fast the charcter moves
+    private float movementSpeed; // how fast the charcter moves
     private int rotationSpeed; // how fast the character can turn
+    private float fleeIncrease; // percentage speed increase when the character is fleeing
 
     public int ForwardAngle
     {
@@ -149,11 +155,26 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
         get { return peripheralAngle; }
         set { peripheralAngle = value; }
     }
+    public float FleeIncrease
+    {
+        get { return fleeIncrease; }
+        set { fleeIncrease = value; }
+    }
+    public float MovementSpeed
+    {
+        get { return movementSpeed; }
+        set { movementSpeed = value; }
+    }
 
     // Character Life
     private int hitPointsMax;
     private float hitPointsCurrent;
     private int hitPointsRegenerate;
+
+    public int HitPointsMax
+    {
+        get { return hitPointsMax; }
+    }
 
     public CharacterSheet() // constructer called on awake()
     {
@@ -188,18 +209,22 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
 
         forwardAngle = 60;
         peripheralAngle = 110;
-        movementSpeed = 0;
+        movementSpeed = 3.5f;
         rotationSpeed = 0;
+        fleeIncrease = 1.5f;
 
         hitPointsMax = 100;
         hitPointsCurrent = hitPointsMax;
         hitPointsRegenerate = 0;
+
+
 
     }
 
     public void Awake()
     {
         characterSheet = GetComponent<CharacterSheet>(); //CharacterSheet(); // set the contents of the character sheet to the constructor values
+        decisionMaking = GetComponent<DecisionMaking>(); // reference to decision making script
     }
 
     public void Update() // every frame
@@ -224,19 +249,25 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
         if (hitPointsCurrent<hitPointsMax) // probably add in a regenerate condition like a bool to check if world conditions allow or have this as a rare/weak
         {
             hitPointsCurrent += hitPointsRegenerate * Time.deltaTime; // regenerate health
+            if (inSafeZone)
+            {
+                hitPointsCurrent += safeZoneHealRate * Time.captureFramerate; // safe zone healing
+                Debug.Log("safe zone healing");
+            }
         }
+
     }
 
     // methods affecting Hit Points
     public void ReduceHitPoints(int damage)
     {
-
         hitPointsCurrent -= damage;
         Debug.Log(hitPointsCurrent.ToString());
         if (hitPointsCurrent<=0)
         {
             Destroy(this.gameObject);
         }
+        decisionMaking.MoraleCheck(damage);
     }
     public void IncreaseHitPoints(float heal) // regular heal to maximum hit points
     {
@@ -271,4 +302,13 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
         }
     }
 
+    public void SafeZoneHealing(int _safeZoneHealRate)
+    {
+        inSafeZone = true; // update that the unit is within a safe zone
+        safeZoneHealRate = _safeZoneHealRate; // update the rate that the unit will heal by
+    }
+    public void LeavingSafeZone()
+    {
+        inSafeZone = false; // update unit so they do not heal as they have left the safe zone
+    }
 }
