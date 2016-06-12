@@ -15,6 +15,8 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     private int attackDamageRange; // attack damage range
     private int attackAccuracy; // likelyhood of attack to hit
 
+    public string enemyTag;
+
     public int AttackAccuracy
     {
         get { return attackAccuracy; }

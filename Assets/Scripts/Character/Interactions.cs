@@ -4,7 +4,7 @@ using System.Collections;
 public class Interactions : MonoBehaviour // this class is designed to pass interactions from the game world to the different AI aspects
 {
 
-    public string enemyTag = "Enemy";
+    //public string enemyTag;
     private Navigation navigation; // create empty Navigation object to assign in start
     private DecisionMaking decisionMaking; // as above for DecisionMaking
     private CharacterSheet characterSheet;
@@ -21,7 +21,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
     public void EnterAttackZone(Collider other)
     {
-        if (other.tag == enemyTag)
+        if (other.tag == characterSheet.enemyTag)
         {
             Debug.Log("Entered Zone"); // writes a message to console
             navigation.UpdateTarget(decisionMaking.FindSafeZone());
@@ -33,7 +33,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     public void InsideAttackZone(Collider other) // if the enemy is within the attack zone
     {
         //Debug.Log("called interaction method");
-        if (other.tag == enemyTag)
+        if (other.tag == characterSheet.enemyTag)
         {
             decisionMaking.CombatAction(other); // call the combat action AI section
             //Debug.Log("detected enemy tag");
@@ -42,7 +42,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
     public void NotFacing(Collider other)
     {
-        if (other.tag == enemyTag)
+        if (other.tag == characterSheet.enemyTag)
         {
             Debug.Log("Not Facing Enemy");
             
