@@ -49,16 +49,18 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         }
     }
 
-    public void EnteredSafeZone()
+    public void EnteredSafeZone(int _safeZoneHealRate)
     {
         decisionMaking.AtSafeZone = true;
         Debug.Log("Entered Safe Zone");
+        characterSheet.SafeZoneHealing(_safeZoneHealRate);
         navigation.UpdateTarget(decisionMaking.FindEnemy());
     }
 
     public void LeftSafeZone()
     {
         decisionMaking.AtSafeZone = false;
+        characterSheet.LeavingSafeZone();
         Debug.Log("Left Safe Zone");
     }
 

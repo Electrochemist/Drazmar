@@ -5,6 +5,7 @@ using System;
 public class DecisionMaking : MonoBehaviour {
 
     private CharacterSheet characterSheet; // character sheet to be called from game object
+    private Navigation navigation;
     private bool retreat=false; // if the character is fleeing
     /*public bool Retreat // accessor for retreat bool
     {
@@ -24,13 +25,14 @@ public class DecisionMaking : MonoBehaviour {
     public void Awake()
     {
         characterSheet = GetComponent<CharacterSheet>();
+        navigation = GetComponent<Navigation>();
     }
 
     public Transform FindSafeZone() // finds the closest safezone out of all safezones in existance
     {
         Transform safeZone=null; // create empty transform reference
         GameObject[] allSafeZones; // create list of all safe zones - note this is all map so consider ways to reduce area for searching enemy lists or for big map
-        allSafeZones = GameObject.FindGameObjectsWithTag("FriendZone"); // fill the list with all game objects tagged friend zone - perhaps update method to take a string for safe zone
+        allSafeZones = GameObject.FindGameObjectsWithTag(characterSheet.safeZoneTag); // fill the list with all game objects tagged friend zone - perhaps update method to take a string for safe zone
         Vector3 currentPosition = transform.position; // set a vector3 for where the game object is
 
         float bestDistanceSqr = Mathf.Infinity; // set the initial best distance to infinity
@@ -124,6 +126,14 @@ public class DecisionMaking : MonoBehaviour {
                     Debug.Log("Missed the enemy");
                 }
             }
+        }
+    }
+    public void MoraleCheck(int damage) // checks how hard the unit has been hit, and triggers a run away based on max life percentage
+    {
+        float damagePercentage = damage / characterSheet.HitPointsMax+1;
+        if (UnityEngine.Random.value<damagePercentage) // Note: UnityEngine.Random used as system also has a random. If the random roll is lower than the damage percent run safe
+        {
+            navigation.UpdateTarget(FindSafeZone());
         }
     }
 
