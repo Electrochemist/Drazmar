@@ -133,7 +133,7 @@ public class DecisionMaking : MonoBehaviour {
         float damagePercentage = damage / characterSheet.HitPointsMax+1;
         if (UnityEngine.Random.value<damagePercentage) // Note: UnityEngine.Random used as system also has a random. If the random roll is lower than the damage percent run safe
         {
-            navigation.UpdateTarget(FindSafeZone());
+            navigation.UpdateTarget(FindSafeZone(), characterSheet.FleeIncrease*characterSheet.MovementSpeed);
         }
     }
 

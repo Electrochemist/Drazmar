@@ -141,8 +141,9 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     private int forwardAngle; // angle in degrees that the character can perform forward actions within
     private int peripheralAngle; // angle in degrees that the character can perform perihpheral action within
     // private int backAngle; - probably not needed as this will be greater than perihperal but less than 180;
-    private int movementSpeed; // how fast the charcter moves
+    private float movementSpeed; // how fast the charcter moves
     private int rotationSpeed; // how fast the character can turn
+    private float fleeIncrease; // percentage speed increase when the character is fleeing
 
     public int ForwardAngle
     {
@@ -153,6 +154,16 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     {
         get { return peripheralAngle; }
         set { peripheralAngle = value; }
+    }
+    public float FleeIncrease
+    {
+        get { return fleeIncrease; }
+        set { fleeIncrease = value; }
+    }
+    public float MovementSpeed
+    {
+        get { return movementSpeed; }
+        set { movementSpeed = value; }
     }
 
     // Character Life
@@ -198,8 +209,9 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
 
         forwardAngle = 60;
         peripheralAngle = 110;
-        movementSpeed = 0;
+        movementSpeed = 3.5f;
         rotationSpeed = 0;
+        fleeIncrease = 1.5f;
 
         hitPointsMax = 100;
         hitPointsCurrent = hitPointsMax;

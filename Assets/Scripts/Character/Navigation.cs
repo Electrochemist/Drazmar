@@ -9,7 +9,7 @@ public class Navigation : MonoBehaviour {
     private NavMeshAgent agent; // create empty nav mesh agent
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
         agent = GetComponent<NavMeshAgent>(); // sets the instance of the navmesh attached to the game object to instance called agent
         //target = transform; // sets the destination to the position of the target transform
     }
@@ -26,8 +26,9 @@ public class Navigation : MonoBehaviour {
         }
     }
 
-    public void UpdateTarget(Transform _target)
+    public void UpdateTarget(Transform _target, float _speed)
     {
+        agent.speed = _speed;
         target = _target;
     }
     

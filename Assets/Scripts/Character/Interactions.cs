@@ -15,16 +15,20 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         navigation = GetComponent<Navigation>(); // creates a reference to the Navigation component on the game object
         decisionMaking = GetComponent<DecisionMaking>(); // as above except decision making
         characterSheet = GetComponent<CharacterSheet>();
-        navigation.UpdateTarget(decisionMaking.FindEnemy()); // on creation find an enemy to attack - replace this with a what should I do call in decision making
+        
     }
 
+    public void Start()
+    {
+        navigation.UpdateTarget(decisionMaking.FindEnemy(), characterSheet.MovementSpeed); // on creation find an enemy to attack - replace this with a what should I do call in decision making
+    }
 
     public void EnterAttackZone(Collider other)
     {
         if (other.tag == characterSheet.enemyTag)
         {
             Debug.Log("Entered Zone"); // writes a message to console
-            navigation.UpdateTarget(decisionMaking.FindSafeZone());
+            //navigation.UpdateTarget(decisionMaking.FindSafeZone(), characterSheet.MovementSpeed);
             //decisionMaking.Retreat = true;
             //navigation.UpdateTarget(transform);
         }
@@ -54,7 +58,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         decisionMaking.AtSafeZone = true;
         Debug.Log("Entered Safe Zone");
         characterSheet.SafeZoneHealing(_safeZoneHealRate);
-        navigation.UpdateTarget(decisionMaking.FindEnemy());
+        navigation.UpdateTarget(decisionMaking.FindEnemy(), characterSheet.MovementSpeed);
     }
 
     public void LeftSafeZone()
