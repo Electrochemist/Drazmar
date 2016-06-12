@@ -54,7 +54,7 @@ public class DecisionMaking : MonoBehaviour {
     {
         Transform enemy = null; // create empty transform reference
         GameObject[] enemies; // create list of all safe zones - note this is all map so consider ways to reduce area for searching enemy lists or for big map
-        enemies = GameObject.FindGameObjectsWithTag("Enemy"); // fill the list with all game objects tagged Enemy - perhaps update method to take a string for safe zone
+        enemies = GameObject.FindGameObjectsWithTag(characterSheet.enemyTag); // fill the list with all game objects tagged Enemy - perhaps update method to take a string for safe zone
         Vector3 currentPosition = transform.position; // set a vector3 for where the game object is
 
         float bestDistanceSqr = Mathf.Infinity; // set the initial best distance to infinity
