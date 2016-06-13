@@ -176,6 +176,19 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
         get { return hitPointsMax; }
     }
 
+    // Character Senses
+    private float hearingRadius; // range the character can detect by hearing
+    private float sightRadius; // range the character can see
+
+    public float HearingRadius
+    {
+        get { return hearingRadius; }
+    }
+    public float SightRadius
+    {
+        get { return sightRadius; }
+    }
+
     public CharacterSheet() // constructer called on awake()
     {
         attackChargeMax = 0;
@@ -217,7 +230,8 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
         hitPointsCurrent = hitPointsMax;
         hitPointsRegenerate = 0;
 
-
+        hearingRadius = 10;
+        sightRadius = 50;
 
     }
 
