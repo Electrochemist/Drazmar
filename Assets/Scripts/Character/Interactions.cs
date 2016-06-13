@@ -152,9 +152,6 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         return detectableEnemy;
     }
 
-    public void Update()
-    {
-        Look();
-    }
+    
     
 }

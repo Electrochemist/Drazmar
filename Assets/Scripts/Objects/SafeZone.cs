@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class SafeZone : MonoBehaviour {
 
     public string friend; // sets the tag that will create a trigger response
+    
    
     private string enterSafeZone = "EnteredSafeZone"; // name of method to call on entering the safe zone
     private int healRate = 5; // health per second
+    
 
     private string leftSafeZone = "LeftSafeZone"; // name of method to call on leaving the safe zone
 
@@ -28,4 +30,6 @@ public class SafeZone : MonoBehaviour {
             other.SendMessage(leftSafeZone);
         }
     }
+
+    
 }

@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\Character\Interactions.cs" />
     <Compile Include="Assets\Scripts\Character\Navigation.cs" />
     <Compile Include="Assets\Scripts\GameEngine\MeleeAttackEngine.cs" />
+    <Compile Include="Assets\Scripts\Objects\BuildingSensing.cs" />
     <Compile Include="Assets\Scripts\Objects\SafeZone.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
