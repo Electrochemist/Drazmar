@@ -7,13 +7,14 @@ public class DecisionMaking : MonoBehaviour {
     private CharacterSheet characterSheet; // character sheet to be called from game object
     private Navigation navigation;
     private bool retreat=false; // if the character is fleeing
-    /*public bool Retreat // accessor for retreat bool
+    private string role; // decides what decision tree to use
+    public bool Retreat // accessor for retreat bool
     {
         get
         { return retreat; }
         set
         { Retreat = value; }
-    }*/
+    }
         
     private bool atSafeZone;
     public bool AtSafeZone
@@ -26,6 +27,7 @@ public class DecisionMaking : MonoBehaviour {
     {
         characterSheet = GetComponent<CharacterSheet>();
         navigation = GetComponent<Navigation>();
+        role = "Defend";
     }
 
     public Transform FindSafeZone() // finds the closest safezone out of all safezones in existance
@@ -50,6 +52,11 @@ public class DecisionMaking : MonoBehaviour {
         }
 
         return safeZone;
+    }
+
+    public void MoveToHealing() // move unit sensibly to the nearest healing position
+    {
+        navigation.UpdateTarget(FindSafeZone(), characterSheet.MovementSpeed);
     }
 
     public Transform FindEnemy() // finds the closest enemy in existance
@@ -130,11 +137,47 @@ public class DecisionMaking : MonoBehaviour {
     }
     public void MoraleCheck(int damage) // checks how hard the unit has been hit, and triggers a run away based on max life percentage
     {
-        float damagePercentage = damage / characterSheet.HitPointsMax+1;
+        float damagePercentage = damage / characterSheet.HitPointsMax;
         if (UnityEngine.Random.value<damagePercentage) // Note: UnityEngine.Random used as system also has a random. If the random roll is lower than the damage percent run safe
         {
+            retreat = true;
             navigation.UpdateTarget(FindSafeZone(), characterSheet.FleeIncrease*characterSheet.MovementSpeed);
         }
     }
 
+
+    public void MakeADecision() // this method is used to cycle through decision trees to pick what action the unit should perform
+    {
+        if (retreat) // if morale is broken the unit is fleeing home and cannot make another decision!
+        {
+            return;
+        }
+        if (atSafeZone&&characterSheet.HitPointsCurrent<characterSheet.HitPointsMax) // if healing at a safe zone wait to be fully healed
+        {
+            return;
+        }
+        switch (role)
+        {
+            case "Defend":
+                {
+                    DefendTree();
+                    return;
+                }
+            default:
+                {
+                    Debug.Log("No role set in DecisionMaking.cs");
+                    break;
+                }
+        }
+    }
+
+    public void DefendTree()
+    {
+        if (characterSheet.HitPointsCurrent < 0.25*characterSheet.HitPointsMax) // if less than 25% health, go to healing
+        {
+            MoveToHealing();
+            return;
+        }
+
+    }
 }

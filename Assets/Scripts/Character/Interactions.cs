@@ -59,6 +59,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     public void EnteredSafeZone(int _safeZoneHealRate)
     {
         decisionMaking.AtSafeZone = true;
+        decisionMaking.Retreat = false;
         Debug.Log("Entered Safe Zone");
         characterSheet.SafeZoneHealing(_safeZoneHealRate);
         navigation.UpdateTarget(decisionMaking.FindEnemy(), characterSheet.MovementSpeed);

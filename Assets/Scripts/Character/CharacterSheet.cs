@@ -175,6 +175,10 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     {
         get { return hitPointsMax; }
     }
+    public float HitPointsCurrent
+    {
+        get { return hitPointsCurrent; }
+    }
 
     // Character Senses
     private float hearingRadius; // range the character can detect by hearing
