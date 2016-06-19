@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System;
+
 
 public class DecisionMaking : MonoBehaviour {
 
     private CharacterSheet characterSheet; // character sheet to be called from game object
     private Navigation navigation;
+    private Interactions interactions;
     private bool retreat=false; // if the character is fleeing
     private string role; // decides what decision tree to use
     public bool Retreat // accessor for retreat bool
@@ -27,6 +29,7 @@ public class DecisionMaking : MonoBehaviour {
     {
         characterSheet = GetComponent<CharacterSheet>();
         navigation = GetComponent<Navigation>();
+        interactions = GetComponent<Interactions>();
         role = "Defend";
     }
 
@@ -59,11 +62,11 @@ public class DecisionMaking : MonoBehaviour {
         navigation.UpdateTarget(FindSafeZone(), characterSheet.MovementSpeed);
     }
 
-    public Transform FindEnemy() // finds the closest enemy in existance
+    public Transform FindEnemy(List<GameObject> senseEnemies) // finds the closest enemy in that can be sensed
     {
         Transform enemy = null; // create empty transform reference
-        GameObject[] enemies; // create list of all safe zones - note this is all map so consider ways to reduce area for searching enemy lists or for big map
-        enemies = GameObject.FindGameObjectsWithTag(characterSheet.enemyTag); // fill the list with all game objects tagged Enemy - perhaps update method to take a string for safe zone
+        List<GameObject> enemies = senseEnemies; // assigns the detected enemies to be searched
+               
         Vector3 currentPosition = transform.position; // set a vector3 for where the game object is
 
         float bestDistanceSqr = Mathf.Infinity; // set the initial best distance to infinity
@@ -177,6 +180,18 @@ public class DecisionMaking : MonoBehaviour {
         {
             MoveToHealing();
             return;
+        }
+        List<GameObject> senseEnemies = interactions.SenseEnemies(); // enemies that the unit can detect
+        if (senseEnemies!=null) // if the unit can detect an enemy, move to the closest enemy
+        {
+            FindEnemy(senseEnemies);
+            // create an alert
+        }
+        // if alarm
+        // if alert
+        else // patrol
+        {
+
         }
 
     }

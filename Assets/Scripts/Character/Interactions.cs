@@ -23,7 +23,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
     public void Start()
     {
-        navigation.UpdateTarget(decisionMaking.FindEnemy(), characterSheet.MovementSpeed); // on creation find an enemy to attack - replace this with a what should I do call in decision making
+        decisionMaking.MakeADecision(); // on start make a decision!
     }
 
     public void EnterAttackZone(Collider other)
@@ -62,7 +62,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         decisionMaking.Retreat = false;
         Debug.Log("Entered Safe Zone");
         characterSheet.SafeZoneHealing(_safeZoneHealRate);
-        navigation.UpdateTarget(decisionMaking.FindEnemy(), characterSheet.MovementSpeed);
+        
     }
 
     public void LeftSafeZone()
@@ -153,6 +153,19 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         return detectableEnemy;
     }
 
-    
+    public List<GameObject> SenseEnemies() // using all senses return a list of detectable enemies as game objects
+    {
+        List<GameObject> senseEnemies = new List<GameObject>();
+        List<Collider> detectableEnemies = Look(); // creates list of enemies that can be seen
+        detectableEnemies.AddRange(Listen());
+        if (detectableEnemies!=null)
+        {
+            foreach (Collider col in detectableEnemies)
+            {
+                senseEnemies.Add(col.gameObject);
+            }
+        }
+        return senseEnemies;
+    }
     
 }
