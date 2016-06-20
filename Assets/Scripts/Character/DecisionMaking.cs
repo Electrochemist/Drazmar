@@ -231,19 +231,21 @@ public class DecisionMaking : MonoBehaviour {
             MoveToHealing();
             return;
         }
-        //List<GameObject> senseEnemies = interactions.SenseEnemies(); // enemies that the unit can detect
-        /*if (senseEnemies!=null) // if the unit can detect an enemy, move to the closest enemy
+        List<GameObject> senseEnemies = interactions.SenseEnemies(); // enemies that the unit can detect
+        if (senseEnemies.Count!=0) // if the unit can detect an enemy, move to the closest enemy
         {
             Debug.Log("Sensed Enemy");
 
             navigation.UpdateTarget(FindEnemy(senseEnemies), characterSheet.MovementSpeed);
+            return;
             // create an alert
-        }*/
+        }
         // if alarm
         // if alert
         else // patrol
         {
             Patrol();
+            return;
         }
 
     }
