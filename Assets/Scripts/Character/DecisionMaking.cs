@@ -15,7 +15,7 @@ public class DecisionMaking : MonoBehaviour {
         get
         { return retreat; }
         set
-        { Retreat = value; }
+        { retreat = value; }
     }
         
     private bool atSafeZone;
@@ -25,12 +25,33 @@ public class DecisionMaking : MonoBehaviour {
         set { atSafeZone = value; }
     }
 
+    private bool onPatrol; // bool to show that the unit is on patrol
+    public bool OnPatrol
+    {
+        get { return onPatrol; }
+        set { onPatrol = value; }
+    }
+
+    // START OF METHODS
+
     public void Awake()
     {
         characterSheet = GetComponent<CharacterSheet>();
         navigation = GetComponent<Navigation>();
         interactions = GetComponent<Interactions>();
         role = "Defend";
+    }
+
+    public void Update()
+    {
+        if (onPatrol) // check to see if the patrolling unit is close to destination position, if so, get new waypoint
+        {
+            Vector3 distanceToPatrolWayPoint = transform.position - navigation.Target.position;
+            if (distanceToPatrolWayPoint.sqrMagnitude<10)
+            {
+                Patrol();
+            }
+        }
     }
 
     public Transform FindSafeZone() // finds the closest safezone out of all safezones in existance
@@ -86,7 +107,7 @@ public class DecisionMaking : MonoBehaviour {
         return enemy;
     }
 
-    public void CombatAction(Collider enemy)
+    public void CombatAction(Collider enemy) // attack decision - basic attack only
     {
         float angle = Vector3.Angle(transform.forward, (enemy.transform.position - transform.position)); // angle that the attacker (this object) is facing to the collided oject
         float enemyAngle = Vector3.Angle(enemy.transform.forward, (transform.position - enemy.transform.position)); // the angle that the enemy is being attacked at. Note both angles at 0-180
@@ -148,9 +169,36 @@ public class DecisionMaking : MonoBehaviour {
         }
     }
 
+    public void Patrol() // search building list and pick a random building to walk to
+    {
+        List<GameObject> buildings = new List<GameObject>();
+
+        if (characterSheet.safeZoneTag == "FriendZone")
+        {
+            buildings = FriendlyBuildingList.friendlyBuildingList.ListOfFriendlyBuildings;
+
+            Debug.Log(FriendlyBuildingList.friendlyBuildingList.ListOfFriendlyBuildings.Count.ToString());
+            Debug.Log(buildings.Count.ToString() + "buildings");
+        }
+        if (characterSheet.safeZoneTag == "EnemyZone")
+        {
+            buildings = EnemyBuildingList.enemyBuildingList.ListOfEnemyBuildings;
+        }
+
+        onPatrol = true;
+        float randomIndex = (UnityEngine.Random.value * (buildings.Count));
+        if (randomIndex== buildings.Count) // stops a random value of 1 from giving an index out of range
+        {
+            randomIndex--;
+        }
+        navigation.UpdateTarget(buildings[(int)randomIndex].transform, characterSheet.MovementSpeed); // convert float to int
+
+    }
 
     public void MakeADecision() // this method is used to cycle through decision trees to pick what action the unit should perform
     {
+        Debug.Log("Making a decision");
+        onPatrol = false; // reset patrol flag to false
         if (retreat) // if morale is broken the unit is fleeing home and cannot make another decision!
         {
             return;
@@ -176,22 +224,26 @@ public class DecisionMaking : MonoBehaviour {
 
     public void DefendTree()
     {
+        Debug.Log("Making Defense Decision");
         if (characterSheet.HitPointsCurrent < 0.25*characterSheet.HitPointsMax) // if less than 25% health, go to healing
         {
+            
             MoveToHealing();
             return;
         }
-        List<GameObject> senseEnemies = interactions.SenseEnemies(); // enemies that the unit can detect
-        if (senseEnemies!=null) // if the unit can detect an enemy, move to the closest enemy
+        //List<GameObject> senseEnemies = interactions.SenseEnemies(); // enemies that the unit can detect
+        /*if (senseEnemies!=null) // if the unit can detect an enemy, move to the closest enemy
         {
-            FindEnemy(senseEnemies);
+            Debug.Log("Sensed Enemy");
+
+            navigation.UpdateTarget(FindEnemy(senseEnemies), characterSheet.MovementSpeed);
             // create an alert
-        }
+        }*/
         // if alarm
         // if alert
         else // patrol
         {
-
+            Patrol();
         }
 
     }

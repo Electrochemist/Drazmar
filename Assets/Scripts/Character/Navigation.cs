@@ -6,6 +6,10 @@ public class Navigation : MonoBehaviour {
     // may need agent.UpdateRotation = true; and agent.UpdatePosition = true; but not sure as the agent is attached to the gameobject...
 
     private Transform target; // create empty transform for the target
+    public Transform Target
+    {
+        get { return target; }
+    }
     private NavMeshAgent agent; // create empty nav mesh agent
 
     // Use this for initialization

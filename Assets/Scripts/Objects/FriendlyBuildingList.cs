@@ -8,8 +8,13 @@ public class FriendlyBuildingList : MonoBehaviour
     public static FriendlyBuildingList friendlyBuildingList;
 
     private List<GameObject> friendlyBuildings;
-    private string[] friendlyBuildingTags = new string[] { "FriendZone", "FriendBuilding" }; // assigns all the possible friendly building tags to the list
+    private string[] friendlyBuildingTags = new string[] { "FriendZone" }; // assigns all the possible friendly building tags to the list
     
+    public List<GameObject> ListOfFriendlyBuildings
+    {
+        get { return friendlyBuildings; }
+    }
+        
 
     // Use this for initialization
     public void Awake() // called once before start
@@ -22,6 +27,7 @@ public class FriendlyBuildingList : MonoBehaviour
         {
             friendlyBuildingList = this;
         }
+        UpdateBuildingList();
     }
 
     // Update is called once per frame
@@ -32,11 +38,15 @@ public class FriendlyBuildingList : MonoBehaviour
 
     void UpdateBuildingList() // clears list, then updates the building list - call on start, and whe a building is created or destroyed!
     {
-        friendlyBuildings = null;
-        for (int i = 0; i < friendlyBuildingTags.Length; i++)
+        friendlyBuildingList.friendlyBuildings = new List<GameObject>();
+        for (int i = 0; i < friendlyBuildingTags.Length; i++) // add buildings with a friendly tag to the list
         {
-            friendlyBuildings.Add(GameObject.FindGameObjectsWithTag(friendlyBuildingTags[i])); // fill the list with all game objects tagged friendly buildings
+            friendlyBuildings.AddRange(GameObject.FindGameObjectsWithTag(friendlyBuildingTags[i])); // fill the list with all game objects tagged friendly buildings
+
         }
     }
+
+
+    
 
 }

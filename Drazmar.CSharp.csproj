@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\Character\Navigation.cs" />
     <Compile Include="Assets\Scripts\GameEngine\MeleeAttackEngine.cs" />
     <Compile Include="Assets\Scripts\Objects\BuildingSensing.cs" />
+    <Compile Include="Assets\Scripts\Objects\EnemyBuildingList.cs" />
     <Compile Include="Assets\Scripts\Objects\FriendlyBuildingList.cs" />
     <Compile Include="Assets\Scripts\Objects\SafeZone.cs" />
   </ItemGroup>

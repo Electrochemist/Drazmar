@@ -23,6 +23,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
     public void Start()
     {
+        
         decisionMaking.MakeADecision(); // on start make a decision!
     }
 
