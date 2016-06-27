@@ -184,7 +184,14 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
                 decisionMaking.PatrolDetect(Listen()); // decide what to do about enemy
             }
         }
-        if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing) // not fleeing, not patrolling, not in combat
+        else if (decisionMaking.Healing)
+        {
+            if (characterSheet.HitPointsCurrent >= characterSheet.HitPointsMax) // check health
+            {
+                decisionMaking.MakeADecision();
+            }
+        }
+        else if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing) // not fleeing, not patrolling, not in combat
         {
             decisionMaking.MakeADecision(); // then decide what to do!
         }

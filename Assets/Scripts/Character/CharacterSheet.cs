@@ -269,8 +269,8 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
             hitPointsCurrent += hitPointsRegenerate * Time.deltaTime; // regenerate health
             if (inSafeZone)
             {
-                hitPointsCurrent += safeZoneHealRate * Time.captureFramerate; // safe zone healing
-                Debug.Log("safe zone healing");
+                hitPointsCurrent += safeZoneHealRate * Time.deltaTime; // safe zone healing
+                Debug.Log("safe zone healing for " + characterSheet.hitPointsCurrent.ToString() + "/" + characterSheet.hitPointsMax.ToString());
             }
         }
 

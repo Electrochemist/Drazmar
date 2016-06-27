@@ -268,7 +268,7 @@ public class DecisionMaking : MonoBehaviour {
     public void DefendTree()
     {
         Debug.Log("Making Defense Decision");
-        if (characterSheet.HitPointsCurrent < 0.25*characterSheet.HitPointsMax) // if less than 25% health, go to healing
+        if (characterSheet.HitPointsCurrent < 0.5*characterSheet.HitPointsMax) // if less than 50% health, go to healing
         {
             healing = true; // set mind set
             MoveToHealing(); // move to healing zone
