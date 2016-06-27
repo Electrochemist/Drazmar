@@ -46,6 +46,9 @@ public class DecisionMaking : MonoBehaviour {
         set { healing = value; }
     }
 
+    private bool respondToAlarm; // responding to an alarm
+    public bool RespondToAlarm
+    { get { return respondToAlarm; } }
 
 
     // START OF METHODS
@@ -185,27 +188,32 @@ public class DecisionMaking : MonoBehaviour {
         float damagePercentage = damage / characterSheet.HitPointsMax;
         if (UnityEngine.Random.value<damagePercentage) // Note: UnityEngine.Random used as system also has a random. If the random roll is lower than the damage percent run safe
         {
+            SetAllMindStatesFalse();
             retreat = true;
             navigation.UpdateTarget(FindSafeZone(), characterSheet.FleeIncrease*characterSheet.MovementSpeed);
         }
     }
 
-    public void Patrol() // search building list and pick a random building to walk to
+    public List<GameObject> GetBuildingsList()
     {
         List<GameObject> buildings = new List<GameObject>();
 
-        if (characterSheet.safeZoneTag == "FriendZone")
+        if (characterSheet.safeZoneTag == "FriendZone") // if friendly unit
         {
-            buildings = FriendlyBuildingList.friendlyBuildingList.ListOfFriendlyBuildings;
-
-            Debug.Log(FriendlyBuildingList.friendlyBuildingList.ListOfFriendlyBuildings.Count.ToString());
-            Debug.Log(buildings.Count.ToString() + "buildings");
+            buildings = FriendlyBuildingList.friendlyBuildingList.ListOfFriendlyBuildings; // take list of friendly buildings
         }
-        if (characterSheet.safeZoneTag == "EnemyZone")
+        if (characterSheet.safeZoneTag == "EnemyZone") // if enemy unit
         {
-            buildings = EnemyBuildingList.enemyBuildingList.ListOfEnemyBuildings;
+            buildings = EnemyBuildingList.enemyBuildingList.ListOfEnemyBuildings; // take list of enemy buildings
         }
+        return buildings;
+    }
 
+    public void Patrol() // search building list and pick a random building to walk to
+    {
+        List<GameObject> buildings = new List<GameObject>();
+        buildings = GetBuildingsList(); // call method to select friendly or enemy building list
+        SetAllMindStatesFalse();
         onPatrol = true;
         float randomIndex = (UnityEngine.Random.value * (buildings.Count));
         if (randomIndex== buildings.Count) // stops a random value of 1 from giving an index out of range
@@ -213,8 +221,49 @@ public class DecisionMaking : MonoBehaviour {
             randomIndex--;
         }
         navigation.UpdateTarget(buildings[(int)randomIndex].transform, characterSheet.MovementSpeed); // convert float to int
-
     }
+
+    public List<GameObject> CheckForAlarms()
+    {
+        List<GameObject> buildings = new List<GameObject>();
+        buildings = GetBuildingsList(); // call method to select friendly or enemy building list
+
+        List<GameObject> alarmBuildings = new List<GameObject>();
+
+        foreach (GameObject building in buildings)
+        {
+            if (building.GetComponent<BuildingSensing>().ThreatToStructure <= 0) // if there is no structural threat
+            {
+                alarmBuildings.Add(building); // remove the building from the list
+            }
+        }
+        return alarmBuildings;
+    }
+
+    public void MoveToNearestAlarm(List<GameObject> buildings)
+    {
+        float bestDistanceSqr = Mathf.Infinity; // prepare to find closest alarm
+
+        GameObject closestAlarm = new GameObject();
+        Vector3 currentPosition = transform.position;
+
+        foreach (GameObject alarm in buildings)
+        {
+            Vector3 distance = alarm.transform.position - currentPosition; // create a distance from alarm gameobject
+            float distanceSqr = distance.sqrMagnitude; // square magnitude of distance
+
+            if (distanceSqr < bestDistanceSqr) // if square distance smaller than previous best, update distance and transform.
+            {
+                bestDistanceSqr = distanceSqr;
+                closestAlarm = alarm;
+            }
+        }
+        SetAllMindStatesFalse();
+        respondToAlarm = true;
+        navigation.UpdateTarget(closestAlarm.transform, characterSheet.MovementSpeed);
+    }
+
+    
 
     public void PatrolDetect(List<Collider> senseEnemies) // unit is on patrol and detects enemy
     {
@@ -228,10 +277,21 @@ public class DecisionMaking : MonoBehaviour {
 
     public void AttackEnemy(List<GameObject> senseEnemies) // basic attack nearest enemy that is detected (this could be look and/or listen)
     {
-        onPatrol = false; // turn off patrolling
+        SetAllMindStatesFalse(); // turn off all mind states
         inCombat = true; // mind state for fighting
         navigation.UpdateTarget(FindEnemy(senseEnemies), characterSheet.MovementSpeed);
         return;
+    }
+
+    // Mind state management
+
+    public void SetAllMindStatesFalse()
+    {
+        onPatrol = false;
+        inCombat = false;
+        retreat = false;
+        respondToAlarm = false;
+        healing = false;
     }
 
     // AI tree methods

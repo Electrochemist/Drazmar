@@ -173,15 +173,21 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     {
         if (decisionMaking.OnPatrol) // if patrolling
         {
-            if (Look().Count>0) // if you can see 
+            List<Collider> look = Look();
+            if (look.Count>0) // if you can see 
             {
-                decisionMaking.PatrolDetect(Look()); // decide what to do about enemy
+                decisionMaking.PatrolDetect(look); // decide what to do about enemy
             }
-            if (Listen().Count > 0) // or hear
+            List<Collider> listen = Listen();
+            if (listen.Count > 0) // or hear
             {
-                decisionMaking.PatrolDetect(Listen()); // decide what to do about enemy
+                decisionMaking.PatrolDetect(listen); // decide what to do about enemy
             }
-
+            List<GameObject> checkForAlarms = decisionMaking.CheckForAlarms(); // is there an alarm
+            if (checkForAlarms.Count>0)
+            {
+                decisionMaking.MoveToNearestAlarm(checkForAlarms);
+            }
         }
         else if (decisionMaking.Healing)
         {
@@ -190,7 +196,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
                 decisionMaking.MakeADecision();
             }
         }
-        else if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing) // not fleeing, not patrolling, not in combat
+        else if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing && !decisionMaking.RespondToAlarm) // not fleeing, not patrolling, not in combat
         {
             decisionMaking.MakeADecision(); // then decide what to do!
         }
