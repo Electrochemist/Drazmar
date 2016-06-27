@@ -27,7 +27,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         decisionMaking.MakeADecision(); // on start make a decision!
     }
 
-    public void EnterAttackZone(Collider other)
+    /*public void EnterAttackZone(Collider other)
     {
         if (other.tag == characterSheet.enemyTag)
         {
@@ -36,7 +36,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
             //decisionMaking.Retreat = true;
             //navigation.UpdateTarget(transform);
         }
-    }
+    }*/
 
     public void InsideAttackZone(Collider other) // if the enemy is within the attack zone
     {
@@ -158,7 +158,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     {
         List<GameObject> senseEnemies = new List<GameObject>();
         List<Collider> detectableEnemies = Look(); // creates list of enemies that can be seen
-        detectableEnemies.AddRange(Listen());
+        detectableEnemies.AddRange(Listen()); // adds to the list enemies that can be heard
         if (detectableEnemies!=null)
         {
             foreach (Collider col in detectableEnemies)
@@ -169,4 +169,24 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         return senseEnemies;
     }
     
+    public void Update() // runs each frame - to do add in a time delay for look checks to save resources
+    {
+        if (decisionMaking.OnPatrol) // if patrolling
+        {
+
+            if (Look().Count>0) // if you can see 
+            {
+
+                decisionMaking.PatrolDetect(Look()); // decide what to do about enemy
+            }
+            if (Listen().Count > 0) // or hear
+            {
+                decisionMaking.PatrolDetect(Listen()); // decide what to do about enemy
+            }
+        }
+        if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing) // not fleeing, not patrolling, not in combat
+        {
+            decisionMaking.MakeADecision(); // then decide what to do!
+        }
+    }
 }

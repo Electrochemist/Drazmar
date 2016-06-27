@@ -32,6 +32,22 @@ public class DecisionMaking : MonoBehaviour {
         set { onPatrol = value; }
     }
 
+    private bool inCombat; // bool to show that the unit is in combat
+    public bool InCombat
+    {
+        get { return inCombat; }
+        set { inCombat = value; }
+    }
+
+    private bool healing; // bool to show that the unit is healing
+    public bool Healing
+    {
+        get { return healing; }
+        set { healing = value; }
+    }
+
+
+
     // START OF METHODS
 
     public void Awake()
@@ -151,6 +167,11 @@ public class DecisionMaking : MonoBehaviour {
                 {
                     Debug.Log("Hit the enemy!");
                     MeleeAttackEngine.meleeAttackEngine.DamageTarget(characterSheet, enemyCharacterSheet, enemyAngleBonusDamage, enemyBlockModifier);
+                    if (enemyCharacterSheet.HitPointsCurrent <= 0) // killed enemy
+                    {
+                        // perhaps add in a look around response to killing an enemy
+                        inCombat = false; // no longer in combat
+                    }
                 }
                 else
                 {
@@ -195,6 +216,26 @@ public class DecisionMaking : MonoBehaviour {
 
     }
 
+    public void PatrolDetect(List<Collider> senseEnemies) // unit is on patrol and detects enemy
+    {
+        List<GameObject> senseEnemiesGameObjects = new List<GameObject>(); // convert the colliders to the game object they are attached to
+        foreach (Collider col in senseEnemies)
+        {
+            senseEnemiesGameObjects.Add(col.gameObject);
+        }
+        AttackEnemy(senseEnemiesGameObjects); // attack the detected enemy
+    }
+
+    public void AttackEnemy(List<GameObject> senseEnemies) // basic attack nearest enemy that is detected (this could be look and/or listen)
+    {
+        onPatrol = false; // turn off patrolling
+        inCombat = true; // mind state for fighting
+        navigation.UpdateTarget(FindEnemy(senseEnemies), characterSheet.MovementSpeed);
+        return;
+    }
+
+    // AI tree methods
+
     public void MakeADecision() // this method is used to cycle through decision trees to pick what action the unit should perform
     {
         Debug.Log("Making a decision");
@@ -205,8 +246,10 @@ public class DecisionMaking : MonoBehaviour {
         }
         if (atSafeZone&&characterSheet.HitPointsCurrent<characterSheet.HitPointsMax) // if healing at a safe zone wait to be fully healed
         {
+            healing = true; // set healing mind state
             return;
         }
+        healing = false; // fully healed so reset healing mind state
         switch (role)
         {
             case "Defend":
@@ -227,23 +270,22 @@ public class DecisionMaking : MonoBehaviour {
         Debug.Log("Making Defense Decision");
         if (characterSheet.HitPointsCurrent < 0.25*characterSheet.HitPointsMax) // if less than 25% health, go to healing
         {
-            
-            MoveToHealing();
+            healing = true; // set mind set
+            MoveToHealing(); // move to healing zone
             return;
         }
         List<GameObject> senseEnemies = interactions.SenseEnemies(); // enemies that the unit can detect
         if (senseEnemies.Count!=0) // if the unit can detect an enemy, move to the closest enemy
         {
             Debug.Log("Sensed Enemy");
-
-            navigation.UpdateTarget(FindEnemy(senseEnemies), characterSheet.MovementSpeed);
-            return;
+            AttackEnemy(senseEnemies);
             // create an alert
         }
         // if alarm
         // if alert
         else // patrol
         {
+            onPatrol = true; // mind set for patrolling
             Patrol();
             return;
         }

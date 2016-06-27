@@ -46,7 +46,7 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
         get { return attackTimeToNext; }
         //set { attackTimeToNext = attackSpeed; }
     }
-    public void OnAttack()
+    public void OnAttack() // starts the timer to next attack
     {
         attackTimeToNext = attackSpeed;
     }
