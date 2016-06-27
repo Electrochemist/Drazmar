@@ -173,16 +173,15 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     {
         if (decisionMaking.OnPatrol) // if patrolling
         {
-
             if (Look().Count>0) // if you can see 
             {
-
                 decisionMaking.PatrolDetect(Look()); // decide what to do about enemy
             }
             if (Listen().Count > 0) // or hear
             {
                 decisionMaking.PatrolDetect(Listen()); // decide what to do about enemy
             }
+
         }
         else if (decisionMaking.Healing)
         {

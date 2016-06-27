@@ -20,6 +20,8 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     public string enemyTag;
     public string safeZoneTag;
 
+    private int threat;
+
     public int AttackAccuracy
     {
         get { return attackAccuracy; }
@@ -44,6 +46,11 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     public float AttackTimeToNext
     {
         get { return attackTimeToNext; }
+        //set { attackTimeToNext = attackSpeed; }
+    }
+    public float Threat
+    {
+        get { return threat; }
         //set { attackTimeToNext = attackSpeed; }
     }
     public void OnAttack() // starts the timer to next attack
@@ -204,6 +211,7 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
         attackDamageMin = 25;
         attackDamageRange = 25;
         attackAccuracy = 50;
+        threat = 100;
 
         blockChance = 80;
         blockChargeMax = 50;
