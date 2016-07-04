@@ -172,11 +172,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         if (decisionMaking.OnPatrol) // if patrolling
         {
             ObserveAndFight();
-            List<GameObject> checkForAlarms = decisionMaking.CheckForAlarms(); // is there an alarm
-            if (checkForAlarms.Count>0)
-            {
-                decisionMaking.MoveToNearestAlarm(checkForAlarms);
-            }
+            CheckForAlarms();
         }
         else if (decisionMaking.Healing)
         {
@@ -208,6 +204,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
             {
                 decisionMaking.MakeADecision(); // make a decision on what to do next
             }
+
         }
         else if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing && !decisionMaking.RespondToAlarm) // not fleeing, not patrolling, not in combat
         {
@@ -226,6 +223,15 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         if (listen.Count > 0) // or hear
         {
             decisionMaking.DetectAndFight(listen); // decide what to do about enemy
+        }
+    }
+
+    public void CheckForAlarms()
+    {
+        List<GameObject> checkForAlarms = decisionMaking.CheckForAlarms(); // is there an alarm
+        if (checkForAlarms.Count > 0)
+        {
+            decisionMaking.MoveToNearestAlarm(checkForAlarms);
         }
     }
 }
