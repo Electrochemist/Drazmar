@@ -45,12 +45,11 @@ public class MeleeAttackEngine : MonoBehaviour {
     {
         int baseDamage = (int)(Random.value * attackerCharacterSheet.AttackDamageRange); // unity random 0 to 1, times the variable range of the attacker damage
         int damage = (int)(((attackerCharacterSheet.AttackDamageMin + baseDamage) * targetAngleBonusDamage*targetCharacterSheet.DamageDecrease)-targetCharacterSheet.DamageMitigate); // attack damage calculator - min + the random range addition, times attack zone, times damage decrease, - damage mitigated. - note mitigated damage is after decrease
-        Debug.Log("Hit damage = " + damage.ToString());
+
         if (damage < 1) { return; }
         else if (BlockAttempt(targetCharacterSheet.BlockChance*targetBlockModifier)) // try to block
         {
             damage = BlockDamage(damage, targetCharacterSheet); // if block works decrease damage by blocked amount
-            Debug.Log("Damage after block = " + damage.ToString());
         }
         
         if (damage>0)

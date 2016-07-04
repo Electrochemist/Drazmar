@@ -7,7 +7,7 @@ public class SafeZone : MonoBehaviour {
     
    
     private string enterSafeZone = "EnteredSafeZone"; // name of method to call on entering the safe zone
-    private int healRate = 5; // health per second
+    private int healRate = 10; // health per second
     
 
     private string leftSafeZone = "LeftSafeZone"; // name of method to call on leaving the safe zone

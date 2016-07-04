@@ -23,10 +23,11 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
     public void Start()
     {
-        navigation.UpdateTarget(decisionMaking.FindEnemy(), characterSheet.MovementSpeed); // on creation find an enemy to attack - replace this with a what should I do call in decision making
+        
+        decisionMaking.MakeADecision(); // on start make a decision!
     }
 
-    public void EnterAttackZone(Collider other)
+    /*public void EnterAttackZone(Collider other)
     {
         if (other.tag == characterSheet.enemyTag)
         {
@@ -35,7 +36,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
             //decisionMaking.Retreat = true;
             //navigation.UpdateTarget(transform);
         }
-    }
+    }*/
 
     public void InsideAttackZone(Collider other) // if the enemy is within the attack zone
     {
@@ -59,9 +60,10 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     public void EnteredSafeZone(int _safeZoneHealRate)
     {
         decisionMaking.AtSafeZone = true;
+        decisionMaking.Retreat = false;
         Debug.Log("Entered Safe Zone");
         characterSheet.SafeZoneHealing(_safeZoneHealRate);
-        navigation.UpdateTarget(decisionMaking.FindEnemy(), characterSheet.MovementSpeed);
+        
     }
 
     public void LeftSafeZone()
@@ -85,8 +87,6 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
                 if (CalculatePathLength(col.transform.position) <= characterSheet.HearingRadius)
                 {
                     detectableEnemy.Add(col);
-
-                    Debug.Log("I hear them!");
                 }
             }
         }
@@ -127,11 +127,11 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
         List<Collider> detectableEnemy = new List<Collider>(); // any collider within the hearing radius
 
-        foreach (Collider col in inSightRange)
+        for (int i = 0; i<inSightRange.Length; i++)
         {
-            if (col.tag == characterSheet.enemyTag) // only adds those with the enemy tag to the list
+            if (inSightRange[i].tag == characterSheet.enemyTag) // only adds those with the enemy tag to the list
             {
-                Vector3 directionToTarget = col.transform.position - transform.position; // calculate the direction to the target
+                Vector3 directionToTarget = inSightRange[i].transform.position - transform.position; // calculate the direction to the target
                 float angleToTarget = Vector3.Angle(transform.forward, directionToTarget); // calculates the angle from forward to the target in degrees
                 if (angleToTarget<=characterSheet.PeripheralAngle) // if the target is within the peripheral vision range
                 {
@@ -140,9 +140,8 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
                     {
                         if (hit.transform.tag == characterSheet.enemyTag)
                         {
-                            detectableEnemy.Add(col); // add to the collider list that is detectable
-
-                            Debug.Log(transform.tag + "I see them!");
+                            detectableEnemy.Add(inSightRange[i]); // add to the collider list that is detectable
+                            
                         }
                     }
                 }
@@ -152,6 +151,87 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         return detectableEnemy;
     }
 
+    public List<GameObject> SenseEnemies() // using all senses return a list of detectable enemies as game objects
+    {
+        List<GameObject> senseEnemies = new List<GameObject>();
+        List<Collider> detectableEnemies = Look(); // creates list of enemies that can be seen
+        detectableEnemies.AddRange(Listen()); // adds to the list enemies that can be heard
+        if (detectableEnemies!=null)
+        {
+            foreach (Collider col in detectableEnemies)
+            {
+                senseEnemies.Add(col.gameObject);
+            }
+        }
+        return senseEnemies;
+    }
     
-    
+    public void Update() // runs each frame - to do add in a time delay for look checks to save resources
+    {
+        
+        if (decisionMaking.OnPatrol) // if patrolling
+        {
+            ObserveAndFight();
+            CheckForAlarms();
+        }
+        else if (decisionMaking.Healing)
+        {
+            // add in a limited range observe and fight check
+            if (characterSheet.HitPointsCurrent >= characterSheet.HitPointsMax) // check health
+            {
+                decisionMaking.MakeADecision();
+            }
+        }
+        else if (decisionMaking.RespondToAlarm) // if responding to an alarm
+        {
+            ObserveAndFight();
+            if (navigation.ProximityToTargetSquare()<=(characterSheet.FindAlarmTargetRange^2)) // and if close to the alarm site
+            {
+                decisionMaking.AlarmAttack(); // attack an enemy that triggered the alarm
+            }
+        }
+        else if (decisionMaking.InCombat) // if the unit is in combat mind state
+        {
+           if (Look().Count==0 && Listen().Count==0) // but cannot see any enemies
+            {
+                decisionMaking.GoToLastObservedPosition(); // go to last known position
+            }
+        }
+        else if (decisionMaking.Hunting) // if the unit is hunting (no visible enemy but on the offense)
+        {
+            ObserveAndFight();
+            if (navigation.ProximityToTargetSquare()<=2) // and we are close to our hunting point
+            {
+                decisionMaking.MakeADecision(); // make a decision on what to do next
+            }
+
+        }
+        else if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing && !decisionMaking.RespondToAlarm) // not fleeing, not patrolling, not in combat
+        {
+            decisionMaking.MakeADecision(); // then decide what to do!
+        }
+    }
+
+    public void ObserveAndFight()
+    {
+        List<Collider> look = Look();
+        if (look.Count > 0) // if you can see 
+        {
+            decisionMaking.DetectAndFight(look); // decide what to do about enemy
+        }
+        List<Collider> listen = Listen();
+        if (listen.Count > 0) // or hear
+        {
+            decisionMaking.DetectAndFight(listen); // decide what to do about enemy
+        }
+    }
+
+    public void CheckForAlarms()
+    {
+        List<GameObject> checkForAlarms = decisionMaking.CheckForAlarms(); // is there an alarm
+        if (checkForAlarms.Count > 0)
+        {
+            decisionMaking.MoveToNearestAlarm(checkForAlarms);
+        }
+    }
 }
