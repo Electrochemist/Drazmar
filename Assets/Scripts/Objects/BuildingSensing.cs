@@ -66,6 +66,8 @@ public class BuildingSensing : MonoBehaviour {
         {
             sensedEnemiesGameObject.Add(enemy.gameObject);
         }
+        if (sensedEnemies.Count>0)
+        { Debug.Log("Alarm!"); }
         return sensedEnemiesGameObject;
     }
 

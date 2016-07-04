@@ -284,7 +284,7 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
             if (inSafeZone)
             {
                 hitPointsCurrent += safeZoneHealRate * Time.deltaTime; // safe zone healing
-                Debug.Log("safe zone healing for " + characterSheet.hitPointsCurrent.ToString() + "/" + characterSheet.hitPointsMax.ToString());
+
             }
         }
 
@@ -294,7 +294,6 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     public void ReduceHitPoints(int damage)
     {
         hitPointsCurrent -= damage;
-        Debug.Log(hitPointsCurrent.ToString());
         if (hitPointsCurrent<=0)
         {
             Destroy(this.gameObject);

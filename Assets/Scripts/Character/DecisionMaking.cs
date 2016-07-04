@@ -51,6 +51,11 @@ public class DecisionMaking : MonoBehaviour {
     { get { return respondToAlarm; } }
     private GameObject alarmBuilding; // holder for the alarm building that the unit is responding to
 
+    private bool hunting; // hunting (going to the last known enemy position
+    public bool Hunting
+    {
+        get { return hunting; }
+    }
 
     // START OF METHODS
 
@@ -100,7 +105,7 @@ public class DecisionMaking : MonoBehaviour {
 
     public void MoveToHealing() // move unit sensibly to the nearest healing position
     {
-        navigation.UpdateTarget(FindSafeZone(), characterSheet.MovementSpeed);
+        navigation.UpdateTarget(FindSafeZone(), characterSheet.MovementSpeed, false);
     }
 
     public Transform FindEnemy(List<GameObject> senseEnemies) // finds the closest enemy in that can be sensed
@@ -136,10 +141,7 @@ public class DecisionMaking : MonoBehaviour {
         float enemyBlockModifier;
 
         CharacterSheet enemyCharacterSheet = enemy.gameObject.GetComponentInParent<CharacterSheet>();//enemy.transform.GetComponent<CharacterSheet>(); // this is one way, but might be slow
-
-        //Debug.Log(angle.ToString());
-        //Debug.Log(enemyCharacterSheet.PeripheralAngle.ToString());
-
+        
         if (angle < characterSheet.ForwardAngle) // check if attacker is facing the target
         {
             if (characterSheet.AttackTimeToNext <= 0) // if the attacker can attack
@@ -147,21 +149,18 @@ public class DecisionMaking : MonoBehaviour {
                 characterSheet.OnAttack();
                 if (enemyAngle < enemyCharacterSheet.ForwardAngle) // is the enemy hit in the front
                 {
-                    Debug.Log("Hit Front");
                     enemyAngleBonus = enemyCharacterSheet.AccuracyHitInFront;
                     enemyAngleBonusDamage = enemyCharacterSheet.DamageHitInFront;
                     enemyBlockModifier = enemyCharacterSheet.BlockModifierFront;
                 }
                 else if (enemyAngle >= enemyCharacterSheet.ForwardAngle && enemyAngle < enemyCharacterSheet.PeripheralAngle) // the periperal
                 {
-                    Debug.Log("Hit Periph");
                     enemyAngleBonus = enemyCharacterSheet.AccuracyHitInPeripheral;
                     enemyAngleBonusDamage = enemyCharacterSheet.DamageHitInPeripheral;
                     enemyBlockModifier = enemyCharacterSheet.BlockModifierPeripheral;
                 }
                 else // or the back
                 {
-                    Debug.Log("Hit Back");
                     enemyAngleBonus = enemyCharacterSheet.AccuracyHitInBack;
                     enemyAngleBonusDamage = enemyCharacterSheet.DamageHitInBack;
                     enemyBlockModifier = enemyCharacterSheet.BlockModifierBack;
@@ -169,7 +168,6 @@ public class DecisionMaking : MonoBehaviour {
 
                 if (MeleeAttackEngine.meleeAttackEngine.HitAttempt(characterSheet.AttackAccuracy, 1f, enemyAngleBonus)) // if the hit attempt is successful
                 {
-                    Debug.Log("Hit the enemy!");
                     MeleeAttackEngine.meleeAttackEngine.DamageTarget(characterSheet, enemyCharacterSheet, enemyAngleBonusDamage, enemyBlockModifier);
                     if (enemyCharacterSheet.HitPointsCurrent <= 0) // killed enemy
                     {
@@ -177,10 +175,7 @@ public class DecisionMaking : MonoBehaviour {
                         inCombat = false; // no longer in combat
                     }
                 }
-                else
-                {
-                    Debug.Log("Missed the enemy");
-                }
+                
             }
         }
     }
@@ -191,7 +186,7 @@ public class DecisionMaking : MonoBehaviour {
         {
             SetAllMindStatesFalse();
             retreat = true;
-            navigation.UpdateTarget(FindSafeZone(), characterSheet.FleeIncrease*characterSheet.MovementSpeed);
+            navigation.UpdateTarget(FindSafeZone(), characterSheet.FleeIncrease*characterSheet.MovementSpeed, false);
         }
     }
 
@@ -221,7 +216,7 @@ public class DecisionMaking : MonoBehaviour {
         {
             randomIndex--;
         }
-        navigation.UpdateTarget(buildings[(int)randomIndex].transform, characterSheet.MovementSpeed); // convert float to int
+        navigation.UpdateTarget(buildings[(int)randomIndex].transform, characterSheet.MovementSpeed, false); // convert float to int
     }
 
     public List<GameObject> CheckForAlarms()
@@ -262,7 +257,7 @@ public class DecisionMaking : MonoBehaviour {
         alarmBuilding = closestAlarm;
         SetAllMindStatesFalse();
         respondToAlarm = true;
-        navigation.UpdateTarget(closestAlarm.transform, characterSheet.MovementSpeed);
+        navigation.UpdateTarget(closestAlarm.transform, characterSheet.MovementSpeed, false);
     }
 
     
@@ -279,17 +274,31 @@ public class DecisionMaking : MonoBehaviour {
 
     public void AlarmAttack() // attacks the closest enemy to the character which triggered the alarm
     {
-        AttackEnemy(alarmBuilding.GetComponent<BuildingSensing>().BuildingLookGameObject());
+        List<GameObject> sourceOfAlarm = alarmBuilding.GetComponent<BuildingSensing>().BuildingLookGameObject();
+        if (sourceOfAlarm.Count > 0)
+        {
+            AttackEnemy(alarmBuilding.GetComponent<BuildingSensing>().BuildingLookGameObject());
+        }
+        else
+        {
+            MakeADecision();
+        }
     }
 
     public void AttackEnemy(List<GameObject> senseEnemies) // basic attack nearest enemy that is detected (this could be look and/or listen)
     {
         SetAllMindStatesFalse(); // turn off all mind states
         inCombat = true; // mind state for fighting
-        navigation.UpdateTarget(FindEnemy(senseEnemies), characterSheet.MovementSpeed);
+        navigation.UpdateTarget(FindEnemy(senseEnemies), characterSheet.MovementSpeed, true);
         return;
     }
 
+    public void GoToLastObservedPosition()
+    {
+        SetAllMindStatesFalse(); // turn off all mind states
+        hunting = true; // mindstate set to on the hunt!
+        navigation.Tracking = false; // lost sight turn off tracking!
+    }
 
     // Mind state management
 
@@ -300,6 +309,7 @@ public class DecisionMaking : MonoBehaviour {
         retreat = false;
         respondToAlarm = false;
         healing = false;
+        hunting = false;
     }
 
     // AI tree methods
@@ -307,7 +317,8 @@ public class DecisionMaking : MonoBehaviour {
     public void MakeADecision() // this method is used to cycle through decision trees to pick what action the unit should perform
     {
         Debug.Log("Making a decision");
-        onPatrol = false; // reset patrol flag to false
+        //onPatrol = false; // reset patrol flag to false
+        SetAllMindStatesFalse();
         if (retreat) // if morale is broken the unit is fleeing home and cannot make another decision!
         {
             return;
@@ -345,7 +356,7 @@ public class DecisionMaking : MonoBehaviour {
         List<GameObject> senseEnemies = interactions.SenseEnemies(); // enemies that the unit can detect
         if (senseEnemies.Count!=0) // if the unit can detect an enemy, move to the closest enemy
         {
-            Debug.Log("Sensed Enemy");
+
             AttackEnemy(senseEnemies);
             // create an alert
         }

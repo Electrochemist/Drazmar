@@ -87,8 +87,6 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
                 if (CalculatePathLength(col.transform.position) <= characterSheet.HearingRadius)
                 {
                     detectableEnemy.Add(col);
-
-                    Debug.Log("I hear them!");
                 }
             }
         }
@@ -129,11 +127,11 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
         List<Collider> detectableEnemy = new List<Collider>(); // any collider within the hearing radius
 
-        foreach (Collider col in inSightRange)
+        for (int i = 0; i<inSightRange.Length; i++)
         {
-            if (col.tag == characterSheet.enemyTag) // only adds those with the enemy tag to the list
+            if (inSightRange[i].tag == characterSheet.enemyTag) // only adds those with the enemy tag to the list
             {
-                Vector3 directionToTarget = col.transform.position - transform.position; // calculate the direction to the target
+                Vector3 directionToTarget = inSightRange[i].transform.position - transform.position; // calculate the direction to the target
                 float angleToTarget = Vector3.Angle(transform.forward, directionToTarget); // calculates the angle from forward to the target in degrees
                 if (angleToTarget<=characterSheet.PeripheralAngle) // if the target is within the peripheral vision range
                 {
@@ -142,9 +140,8 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
                     {
                         if (hit.transform.tag == characterSheet.enemyTag)
                         {
-                            detectableEnemy.Add(col); // add to the collider list that is detectable
-
-                            Debug.Log(transform.tag + "I see them!");
+                            detectableEnemy.Add(inSightRange[i]); // add to the collider list that is detectable
+                            
                         }
                     }
                 }
@@ -171,6 +168,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     
     public void Update() // runs each frame - to do add in a time delay for look checks to save resources
     {
+        
         if (decisionMaking.OnPatrol) // if patrolling
         {
             ObserveAndFight();
@@ -194,6 +192,21 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
             if (navigation.ProximityToTargetSquare()<=(characterSheet.FindAlarmTargetRange^2)) // and if close to the alarm site
             {
                 decisionMaking.AlarmAttack(); // attack an enemy that triggered the alarm
+            }
+        }
+        else if (decisionMaking.InCombat) // if the unit is in combat mind state
+        {
+           if (Look().Count==0 && Listen().Count==0) // but cannot see any enemies
+            {
+                decisionMaking.GoToLastObservedPosition(); // go to last known position
+            }
+        }
+        else if (decisionMaking.Hunting) // if the unit is hunting (no visible enemy but on the offense)
+        {
+            ObserveAndFight();
+            if (navigation.ProximityToTargetSquare()<=2) // and we are close to our hunting point
+            {
+                decisionMaking.MakeADecision(); // make a decision on what to do next
             }
         }
         else if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing && !decisionMaking.RespondToAlarm) // not fleeing, not patrolling, not in combat
