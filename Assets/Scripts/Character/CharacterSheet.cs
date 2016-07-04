@@ -151,7 +151,7 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     private float movementSpeed; // how fast the charcter moves
     private int rotationSpeed; // how fast the character can turn
     private float fleeIncrease; // percentage speed increase when the character is fleeing
-
+    
     public int ForwardAngle
     {
         get { return forwardAngle; }
@@ -190,6 +190,7 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     // Character Senses
     private float hearingRadius; // range the character can detect by hearing
     private float sightRadius; // range the character can see
+    private int findAlarmTargetRange; // distance that the unit needs to be to the alarm site to attack the enemy
 
     public float HearingRadius
     {
@@ -198,6 +199,10 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
     public float SightRadius
     {
         get { return sightRadius; }
+    }
+    public int FindAlarmTargetRange
+    {
+        get { return findAlarmTargetRange; }
     }
 
     public CharacterSheet() // constructer called on awake()
@@ -244,6 +249,7 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
 
         hearingRadius = 10;
         sightRadius = 50;
+        findAlarmTargetRange = 10;
 
     }
 

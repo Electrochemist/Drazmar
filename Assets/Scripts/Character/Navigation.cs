@@ -35,5 +35,9 @@ public class Navigation : MonoBehaviour {
         agent.speed = _speed;
         target = _target;
     }
-    
+    public float ProximityToTargetSquare() // returns the distance squared to the navigation target
+    {
+        Vector3 distance = transform.position - Target.position;
+        return distance.sqrMagnitude; // returns the square magnitude of the distance vector
+    }
 }

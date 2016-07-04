@@ -58,6 +58,17 @@ public class BuildingSensing : MonoBehaviour {
         return detectableEnemy;
     }
 
+    public List<GameObject> BuildingLookGameObject() // returns the sensed enemies as a list of game objects
+    {
+        List<Collider> sensedEnemies = BuildingLook();
+        List<GameObject> sensedEnemiesGameObject = new List<GameObject>();
+        foreach(Collider enemy in sensedEnemies)
+        {
+            sensedEnemiesGameObject.Add(enemy.gameObject);
+        }
+        return sensedEnemiesGameObject;
+    }
+
     public void Update()
     {
         BuildingLook();

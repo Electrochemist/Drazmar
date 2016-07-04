@@ -49,6 +49,7 @@ public class DecisionMaking : MonoBehaviour {
     private bool respondToAlarm; // responding to an alarm
     public bool RespondToAlarm
     { get { return respondToAlarm; } }
+    private GameObject alarmBuilding; // holder for the alarm building that the unit is responding to
 
 
     // START OF METHODS
@@ -258,6 +259,7 @@ public class DecisionMaking : MonoBehaviour {
                 closestAlarm = alarm;
             }
         }
+        alarmBuilding = closestAlarm;
         SetAllMindStatesFalse();
         respondToAlarm = true;
         navigation.UpdateTarget(closestAlarm.transform, characterSheet.MovementSpeed);
@@ -265,7 +267,7 @@ public class DecisionMaking : MonoBehaviour {
 
     
 
-    public void PatrolDetect(List<Collider> senseEnemies) // unit is on patrol and detects enemy
+    public void DetectAndFight(List<Collider> senseEnemies) // unit detects enemy
     {
         List<GameObject> senseEnemiesGameObjects = new List<GameObject>(); // convert the colliders to the game object they are attached to
         foreach (Collider col in senseEnemies)
@@ -275,6 +277,11 @@ public class DecisionMaking : MonoBehaviour {
         AttackEnemy(senseEnemiesGameObjects); // attack the detected enemy
     }
 
+    public void AlarmAttack() // attacks the closest enemy to the character which triggered the alarm
+    {
+        AttackEnemy(alarmBuilding.GetComponent<BuildingSensing>().BuildingLookGameObject());
+    }
+
     public void AttackEnemy(List<GameObject> senseEnemies) // basic attack nearest enemy that is detected (this could be look and/or listen)
     {
         SetAllMindStatesFalse(); // turn off all mind states
@@ -282,6 +289,7 @@ public class DecisionMaking : MonoBehaviour {
         navigation.UpdateTarget(FindEnemy(senseEnemies), characterSheet.MovementSpeed);
         return;
     }
+
 
     // Mind state management
 

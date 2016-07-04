@@ -173,16 +173,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     {
         if (decisionMaking.OnPatrol) // if patrolling
         {
-            List<Collider> look = Look();
-            if (look.Count>0) // if you can see 
-            {
-                decisionMaking.PatrolDetect(look); // decide what to do about enemy
-            }
-            List<Collider> listen = Listen();
-            if (listen.Count > 0) // or hear
-            {
-                decisionMaking.PatrolDetect(listen); // decide what to do about enemy
-            }
+            ObserveAndFight();
             List<GameObject> checkForAlarms = decisionMaking.CheckForAlarms(); // is there an alarm
             if (checkForAlarms.Count>0)
             {
@@ -191,14 +182,37 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         }
         else if (decisionMaking.Healing)
         {
+            // add in a limited range observe and fight check
             if (characterSheet.HitPointsCurrent >= characterSheet.HitPointsMax) // check health
             {
                 decisionMaking.MakeADecision();
             }
         }
+        else if (decisionMaking.RespondToAlarm) // if responding to an alarm
+        {
+            ObserveAndFight();
+            if (navigation.ProximityToTargetSquare()<=(characterSheet.FindAlarmTargetRange^2)) // and if close to the alarm site
+            {
+                decisionMaking.AlarmAttack(); // attack an enemy that triggered the alarm
+            }
+        }
         else if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing && !decisionMaking.RespondToAlarm) // not fleeing, not patrolling, not in combat
         {
             decisionMaking.MakeADecision(); // then decide what to do!
+        }
+    }
+
+    public void ObserveAndFight()
+    {
+        List<Collider> look = Look();
+        if (look.Count > 0) // if you can see 
+        {
+            decisionMaking.DetectAndFight(look); // decide what to do about enemy
+        }
+        List<Collider> listen = Listen();
+        if (listen.Count > 0) // or hear
+        {
+            decisionMaking.DetectAndFight(listen); // decide what to do about enemy
         }
     }
 }
