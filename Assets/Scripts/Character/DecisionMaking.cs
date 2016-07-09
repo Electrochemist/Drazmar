@@ -45,6 +45,11 @@ public class DecisionMaking : MonoBehaviour {
         get { return healing; }
         set { healing = value; }
     }
+    private GameObject targetSafeZone; // holder for the safe zone that the unit is heading to
+    public GameObject TargetSafeZone
+    {
+        get { return targetSafeZone; }
+    }
 
     private bool respondToAlarm; // responding to an alarm
     public bool RespondToAlarm
@@ -64,7 +69,13 @@ public class DecisionMaking : MonoBehaviour {
         characterSheet = GetComponent<CharacterSheet>();
         navigation = GetComponent<Navigation>();
         interactions = GetComponent<Interactions>();
+        
         role = "Defend";
+    }
+
+    public void Start()
+    {
+        FindSafeZone();
     }
 
     public void Update()
@@ -99,8 +110,27 @@ public class DecisionMaking : MonoBehaviour {
                 safeZone = zone.transform;
             }
         }
-
+        targetSafeZone = safeZone.gameObject;
         return safeZone;
+    }
+
+    public Transform FindRestPoint() // select an unoccupied rest point at the target safe zone
+    {
+        
+        List<Transform> restPoints = targetSafeZone.GetComponentInChildren<SafeZone>().RestPointList; // gets the list of transforms within the healing zone
+        List<Transform> unoccupiedRestPoints = new List<Transform>();
+
+        foreach (Transform point in restPoints)
+        {
+            
+            if (!point.GetComponent<RestPointScript>().Occupied)
+            {
+                unoccupiedRestPoints.Add(point);
+            }
+        }
+
+        int pointChosen = (int) UnityEngine.Random.value * unoccupiedRestPoints.Count; // cast the random number times length of list as an int to give index of point
+        return unoccupiedRestPoints[pointChosen];
     }
 
     public void MoveToHealing() // move unit sensibly to the nearest healing position
@@ -259,9 +289,7 @@ public class DecisionMaking : MonoBehaviour {
         respondToAlarm = true;
         navigation.UpdateTarget(closestAlarm.transform, characterSheet.MovementSpeed, false);
     }
-
     
-
     public void DetectAndFight(List<Collider> senseEnemies) // unit detects enemy
     {
         List<GameObject> senseEnemiesGameObjects = new List<GameObject>(); // convert the colliders to the game object they are attached to
