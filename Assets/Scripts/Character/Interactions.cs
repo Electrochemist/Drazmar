@@ -63,7 +63,10 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         decisionMaking.Retreat = false;
         Debug.Log("Entered Safe Zone");
         characterSheet.SafeZoneHealing(_safeZoneHealRate);
-        
+        if (decisionMaking.Healing) // if the unit has healing mindstate
+        {
+            navigation.UpdateTarget(decisionMaking.FindRestPoint(),characterSheet.MovementSpeed, false);
+        }
     }
 
     public void LeftSafeZone()
@@ -177,10 +180,12 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         else if (decisionMaking.Healing)
         {
             // add in a limited range observe and fight check
+            
             if (characterSheet.HitPointsCurrent >= characterSheet.HitPointsMax) // check health
             {
                 decisionMaking.MakeADecision();
             }
+            
         }
         else if (decisionMaking.RespondToAlarm) // if responding to an alarm
         {
@@ -200,7 +205,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         else if (decisionMaking.Hunting) // if the unit is hunting (no visible enemy but on the offense)
         {
             ObserveAndFight();
-            if (navigation.ProximityToTargetSquare()<=2) // and we are close to our hunting point
+            if (navigation.ProximityToTargetSquare()<=25) // and we are close to our hunting point
             {
                 decisionMaking.MakeADecision(); // make a decision on what to do next
             }
@@ -228,10 +233,12 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
     public void CheckForAlarms()
     {
+        Debug.Log("checking for alarms");
         List<GameObject> checkForAlarms = decisionMaking.CheckForAlarms(); // is there an alarm
         if (checkForAlarms.Count > 0)
         {
             decisionMaking.MoveToNearestAlarm(checkForAlarms);
+            Debug.Log("responding to an alarm");
         }
     }
 }
