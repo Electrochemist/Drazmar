@@ -258,12 +258,29 @@ public class DecisionMaking : MonoBehaviour {
 
         foreach (GameObject building in buildings)
         {
-            if (building.GetComponent<BuildingSensing>().ThreatToStructure <= 0) // if there is no structural threat
+            if (building.GetComponent<BuildingSensing>().ThreatToStructure > 0)
             {
-                alarmBuildings.Add(building); // remove the building from the list
+                alarmBuildings.Add(building); 
             }
         }
         return alarmBuildings;
+    }
+    public List<GameObject> CheckForThreatToBuilding()
+    {
+        List<GameObject> buildings = new List<GameObject>();
+        buildings = GetBuildingsList(); // call method to select friendly or enemy building list
+
+        List<GameObject> threatenedBuildings = new List<GameObject>();
+
+        foreach (GameObject building in buildings)
+        {
+            if (building.GetComponent<BuildingSensing>().TotalThreat > 0)
+            {
+                threatenedBuildings.Add(building);
+                Debug.Log("Threat to building " + building.GetComponent<BuildingSensing>().TotalThreat);
+            }
+        }
+        return threatenedBuildings;
     }
 
     public void MoveToNearestAlarm(List<GameObject> buildings)
@@ -305,7 +322,7 @@ public class DecisionMaking : MonoBehaviour {
         List<GameObject> sourceOfAlarm = alarmBuilding.GetComponent<BuildingSensing>().BuildingLookGameObject();
         if (sourceOfAlarm.Count > 0)
         {
-            AttackEnemy(alarmBuilding.GetComponent<BuildingSensing>().BuildingLookGameObject());
+            AttackEnemy(sourceOfAlarm);
         }
         else
         {

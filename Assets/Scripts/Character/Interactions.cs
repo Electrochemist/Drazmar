@@ -190,7 +190,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
         else if (decisionMaking.RespondToAlarm) // if responding to an alarm
         {
             ObserveAndFight();
-            if (navigation.ProximityToTargetSquare()<=(characterSheet.FindAlarmTargetRange^2)) // and if close to the alarm site
+            if (navigation.ProximityToTargetSquare()<=(characterSheet.FindAlarmTargetRange^16)) // and if close to the alarm site
             {
                 decisionMaking.AlarmAttack(); // attack an enemy that triggered the alarm
             }
@@ -240,5 +240,13 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
             decisionMaking.MoveToNearestAlarm(checkForAlarms);
             Debug.Log("responding to an alarm");
         }
+        
+        checkForAlarms = decisionMaking.CheckForThreatToBuilding();
+        if (checkForAlarms.Count > 0)
+        {
+            decisionMaking.MoveToNearestAlarm(checkForAlarms);
+            Debug.Log("responding to a threat");
+        }
+        
     }
 }
