@@ -3,7 +3,7 @@ using System.Collections;
 
 public class RestPointScript : MonoBehaviour {
 
-    private bool occupied; // is a friendly using this rest point
+    private bool occupied; // is a anyone using this rest point
     public bool Occupied
     {
         get { return occupied; }
@@ -11,10 +11,16 @@ public class RestPointScript : MonoBehaviour {
 
     public void OnTriggerEnter(Collider other)
     {
-        occupied = true;
+        if (other.tag != "Ground" && other.tag != "Untagged")
+        {
+            occupied = true;
+        }
     }
     public void OnTriggerExit(Collider other)
     {
-        occupied = false;
+        if (other.tag != "Ground" && other.tag != "Untagged")
+        {
+            occupied = false;
+        }
     }
 }
