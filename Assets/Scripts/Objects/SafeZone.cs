@@ -65,7 +65,7 @@ public class SafeZone : MonoBehaviour {
                 restingPlaces.Add(col.transform); // add to the restingPlaces list
             }
         }
-        Debug.Log("number of rest points " + restingPlaces.Count);
+
         return restingPlaces;
     }
       

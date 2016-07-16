@@ -123,11 +123,10 @@ public class DecisionMaking : MonoBehaviour {
 
         foreach (Transform point in restPoints)
         {
-            Debug.Log(point.GetComponent<RestPointScript>().Occupied);
+
             if (!point.GetComponent<RestPointScript>().Occupied)
             {
                 unoccupiedRestPoints.Add(point);
-                Debug.Log("In foreach loop" + unoccupiedRestPoints.Count);
             }
         }
         
@@ -136,7 +135,7 @@ public class DecisionMaking : MonoBehaviour {
         {
             pointChosen--;
         }
-        Debug.Log("Number of available rest points = " + unoccupiedRestPoints.Count + " going to point " + pointChosen);
+        
         return unoccupiedRestPoints[pointChosen];
     }
 
