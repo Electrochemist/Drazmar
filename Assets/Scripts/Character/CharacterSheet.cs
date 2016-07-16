@@ -244,7 +244,7 @@ public class CharacterSheet : MonoBehaviour // This will hold all the character 
         fleeIncrease = 1.5f;
 
         hitPointsMax = 100;
-        hitPointsCurrent = hitPointsMax;
+        hitPointsCurrent = hitPointsMax-80;
         hitPointsRegenerate = 0;
 
         hearingRadius = 10;
