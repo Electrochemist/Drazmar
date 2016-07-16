@@ -24,8 +24,8 @@ public class BuildingSensing : MonoBehaviour {
         get { return threatToStructure; }
     }
 
-    public List<Collider> BuildingLook()
-    {
+    public List<Collider> BuildingLook() // split into BuildingLookForEnemies, BuildingLookForFriends, EnemyThreat, EnemyThreatMinusAllyThreat - then in interactions tree, make responses for EnemyMinusAllyThreat>0, EnemyPresence>0
+    { // will probably change this call on update rather than when called by a unit
         Collider[] inSightRange;
         inSightRange = Physics.OverlapSphere(transform.position, sightRadius);
 

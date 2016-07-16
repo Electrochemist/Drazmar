@@ -211,7 +211,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
             }
 
         }
-        else if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing && !decisionMaking.RespondToAlarm) // not fleeing, not patrolling, not in combat
+        else //if (!decisionMaking.Retreat && !decisionMaking.OnPatrol && !decisionMaking.InCombat && !decisionMaking.Healing && !decisionMaking.RespondToAlarm) // not fleeing, not patrolling, not in combat
         {
             decisionMaking.MakeADecision(); // then decide what to do!
         }
