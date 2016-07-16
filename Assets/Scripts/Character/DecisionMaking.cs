@@ -118,18 +118,25 @@ public class DecisionMaking : MonoBehaviour {
     {
         
         List<Transform> restPoints = targetSafeZone.GetComponentInChildren<SafeZone>().RestPointList; // gets the list of transforms within the healing zone
+        Debug.Log("SafeZone restpoint list has a count of " + restPoints.Count);
         List<Transform> unoccupiedRestPoints = new List<Transform>();
 
         foreach (Transform point in restPoints)
         {
-            
+            Debug.Log(point.GetComponent<RestPointScript>().Occupied);
             if (!point.GetComponent<RestPointScript>().Occupied)
             {
                 unoccupiedRestPoints.Add(point);
+                Debug.Log("In foreach loop" + unoccupiedRestPoints.Count);
             }
         }
-
-        int pointChosen = (int) UnityEngine.Random.value * unoccupiedRestPoints.Count; // cast the random number times length of list as an int to give index of point
+        
+        int pointChosen = (int) (UnityEngine.Random.value * unoccupiedRestPoints.Count); // cast the random number times length of list as an int to give index of point
+        if (pointChosen==unoccupiedRestPoints.Count)
+        {
+            pointChosen--;
+        }
+        Debug.Log("Number of available rest points = " + unoccupiedRestPoints.Count + " going to point " + pointChosen);
         return unoccupiedRestPoints[pointChosen];
     }
 
@@ -277,7 +284,6 @@ public class DecisionMaking : MonoBehaviour {
             if (building.GetComponent<BuildingSensing>().TotalThreat > 0)
             {
                 threatenedBuildings.Add(building);
-                Debug.Log("Threat to building " + building.GetComponent<BuildingSensing>().TotalThreat);
             }
         }
         return threatenedBuildings;
@@ -361,7 +367,7 @@ public class DecisionMaking : MonoBehaviour {
 
     public void MakeADecision() // this method is used to cycle through decision trees to pick what action the unit should perform
     {
-        Debug.Log("Making a decision");
+
         //onPatrol = false; // reset patrol flag to false
         SetAllMindStatesFalse();
         if (retreat) // if morale is broken the unit is fleeing home and cannot make another decision!
@@ -391,7 +397,7 @@ public class DecisionMaking : MonoBehaviour {
 
     public void DefendTree()
     {
-        Debug.Log("Making Defense Decision");
+
         if (characterSheet.HitPointsCurrent < 0.5*characterSheet.HitPointsMax) // if less than 50% health, go to healing
         {
             healing = true; // set mind set

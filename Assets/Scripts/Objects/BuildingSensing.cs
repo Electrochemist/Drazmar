@@ -53,7 +53,7 @@ public class BuildingSensing : MonoBehaviour {
                     {
                         detectableEnemy.Add(col); // add to the collider list that is detectable
                         totalThreat += col.gameObject.GetComponent<CharacterSheet>().Threat; // adds the enemies threat to the buildings danger level
-                        Debug.Log(transform.tag + "I see them!");
+
                     }
                 }
             }
@@ -90,8 +90,7 @@ public class BuildingSensing : MonoBehaviour {
         {
             sensedEnemiesGameObject.Add(enemy.gameObject);
         }
-        if (sensedEnemiesGameObject.Count>0)
-        { Debug.Log("Alarm!"); }
+        
         return sensedEnemiesGameObject;
     }
 

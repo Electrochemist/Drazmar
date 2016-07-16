@@ -61,7 +61,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     {
         decisionMaking.AtSafeZone = true;
         decisionMaking.Retreat = false;
-        Debug.Log("Entered Safe Zone");
+
         characterSheet.SafeZoneHealing(_safeZoneHealRate);
         if (decisionMaking.Healing) // if the unit has healing mindstate
         {
@@ -73,7 +73,7 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
     {
         decisionMaking.AtSafeZone = false;
         characterSheet.LeavingSafeZone();
-        Debug.Log("Left Safe Zone");
+
     }
 
     public List<Collider> Listen() // returns an array of all colliders that have the enemies tag within the listening range of the character
@@ -233,19 +233,17 @@ public class Interactions : MonoBehaviour // this class is designed to pass inte
 
     public void CheckForAlarms()
     {
-        Debug.Log("checking for alarms");
+
         List<GameObject> checkForAlarms = decisionMaking.CheckForAlarms(); // is there an alarm
         if (checkForAlarms.Count > 0)
         {
             decisionMaking.MoveToNearestAlarm(checkForAlarms);
-            Debug.Log("responding to an alarm");
         }
         
         checkForAlarms = decisionMaking.CheckForThreatToBuilding();
         if (checkForAlarms.Count > 0)
         {
             decisionMaking.MoveToNearestAlarm(checkForAlarms);
-            Debug.Log("responding to a threat");
         }
         
     }
